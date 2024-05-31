@@ -18,6 +18,48 @@ routes.get('/playerdata', (req, res) => {
 
 })
 
+// Endpoint para obtener una radio especifica
+routes.get('/radioget/:name', (req, res) => {
+  const { name } = req.params
+  const sql = `SELECT * FROM users WHERE name = ' ${name}'`;
+  let user = null;
+  let station = null;
+  let config = null;
+
+  try {
+    db.query(sql, (err, data) => {
+      user = data[0];
+
+      console.log(user);
+
+      const sqlradios = `SELECT * FROM stations WHERE id_station = '${user.id_station}'`;
+      console.log(sqlradios)
+      db.query(sqlradios, (err, data) => {
+        station = data
+
+        const sqlconfig = `SELECT * FROM config WHERE id_station = '${user.id_station}'`
+        db.query(sqlconfig, (err, data) => {
+          config = data
+
+          const radioData = {
+            user,
+            station,
+            config
+          }
+          
+          res.json(radioData)
+
+        })
+        
+      })
+    })
+  } catch (error) {
+    console.log(error)
+    res.json({message: "Server Error"})
+  }
+
+})
+
 // Endpoint para iniciar sesion con las cuentas de admin
 routes.post("/login", (req, res) => {
   const {mail, password} = req.body;
@@ -46,11 +88,14 @@ routes.post("/login", (req, res) => {
 // Endpoint para generar un reproductor mas usuario generico
 routes.post("/create", (req, res) => {
   // Se reune la data enviada por el generador
-  const singleId = req.body.singleId
+  const singleId = generateString(7);
   const stationData = req.body.station;
   const configData = req.body.config;
   const userName = generateString(10);
   const password = generateString(25)
+  console.log('data station:', stationData)
+  console.log('config Data', configData)
+  console.log(singleId)
 
   // Generar data del user
   if(stationData){
@@ -93,14 +138,14 @@ routes.post("/create", (req, res) => {
 
   // Si existe la config insertarlo en la base de datos
   if(configData){
-    const sql = `INSERT INTO config (id_station, multiradio, metadata, default_slogan, logo_img, json_cover)
-      VALUES ('${singleId}' ,'${configData.multiradio}', '${configData.metadata}', '${configData.default_slogan}', '${configData.logo_img}', '${configData.json_cover}');`
+    const sql = `INSERT INTO config (id_station, multiradio, metadata, default_name, default_slogan, logo_img, json_cover)
+      VALUES ('${singleId}' ,'${configData.multiradio}', '${configData.metadata}', '${configData.default_name}', '${configData.default_slogan}', '${configData.logo_img}', '${configData.json_cover}');`
 
     // Se insertan los datos en la tabla
   try{
     db.query(sql, (err, data) => {
       console.log(err)
-      res.json({message: "Endpoint executed succesfully"})
+      res.json({name: userName})
     })
   } catch (error){
     console.log(error)
