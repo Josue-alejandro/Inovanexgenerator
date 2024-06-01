@@ -3,11 +3,10 @@
 const mysql = require('mysql2');
 
 const db = mysql.createConnection({
-  host: 'viaduct.proxy.rlwy.net',
-  user: 'root',
-  password: 'KxexhaKdBKpAwsGQNuxXFAxhpREVnDRP',
-  database: 'railway',
-  port: 26071
+  host: '5.161.203.214',
+  user: 'playerad_inovacl',
+  password: 'Yampmacc14$',
+  database: 'playerad_dbradio',
 });
 
 db.connect((err) => {
