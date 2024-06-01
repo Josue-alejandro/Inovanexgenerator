@@ -7,6 +7,7 @@ const db = mysql.createConnection({
   user: 'playerad_cli',
   password: 'Yampmacc14$',
   database: 'playerad_dbradio',
+  connectTimeout: 30000
 });
 
 db.connect((err) => {
