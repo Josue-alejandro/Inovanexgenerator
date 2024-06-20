@@ -2,18 +2,11 @@
 
 const mysql = require('mysql2');
 
-//const db = mysql.createConnection({
-//  host: '5.161.203.214',
-//  user: 'playerad_cli',
-//  password: 'Yampmacc14$',
-//  database: 'playerad_dbradio',
-//});
-
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'radiodb',
+  host: '5.161.203.214',
+  user: 'playerad_cli',
+  password: 'Yampmacc14$',
+  database: 'playerad_dbradio',
 });
 
 db.connect((err) => {
