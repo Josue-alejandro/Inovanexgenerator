@@ -93,9 +93,6 @@ routes.post("/create", (req, res) => {
   const configData = req.body.config;
   const userName = generateString(10);
   const password = generateString(25)
-  console.log('data station:', stationData)
-  console.log('config Data', configData)
-  console.log(singleId)
 
   // Generar data del user
   if(stationData){
@@ -116,10 +113,25 @@ routes.post("/create", (req, res) => {
   }
 
   if(stationData){ // Si stationData existe sigue
+
+    
+
+    console.log(stationData)
+
     stationData.forEach(val => {
 
-      const sql = `INSERT INTO stations (id_station, station_name, station_links)
-      VALUES ('${singleId}', '${val.station_name}', '${val.station_links}');`
+      let audioLinks = [];
+      let metadataLinks = []
+
+      val.station_links.forEach(val => {
+        audioLinks.push(val.link);
+        metadataLinks.push(val.metadata)
+      })
+
+      console.log(audioLinks)
+
+      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata)
+      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataLinks}');`
 
       // Se insertan los datos en la tabla
       try {
