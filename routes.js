@@ -19,7 +19,7 @@ routes.get('/playerdata', (req, res) => {
 })
 
 // Endpoint para obtener una radio especifica
-routes.get('/radioget/:name', (req, res) => {
+routes.get('/radioget/:name', async (req, res) => {
   const { name } = req.params
   const sql = `SELECT * FROM users WHERE name = ' ${name}'`;
   let user = null;
@@ -30,22 +30,35 @@ routes.get('/radioget/:name', (req, res) => {
     db.query(sql, (err, data) => {
       user = data[0];
 
-      console.log(user);
-
       const sqlradios = `SELECT * FROM stations WHERE id_station = '${user.id_station}'`;
       console.log(sqlradios)
-      db.query(sqlradios, (err, data) => {
+      db.query(sqlradios, async (err, data) => {
         station = data
 
+        for (let index = 0; index < station.length; index++) {
+          const element = station[index];
+
+          const programmingLinks = station[index].programming.split(',')
+
+          if(programmingLinks[0] !== ''){
+            const respuesta = await fetch(programmingLinks[0]);
+            const response = await respuesta.json()
+            station[index].programming = response.radio.programming
+          }
+        }
+
         const sqlconfig = `SELECT * FROM config WHERE id_station = '${user.id_station}'`
-        db.query(sqlconfig, (err, data) => {
+        db.query(sqlconfig, async (err, data) => {
           config = data
 
           const radioData = {
             user,
             station,
-            config
+            config,
+  
           }
+
+          console.log(radioData)
           
           res.json(radioData)
 
