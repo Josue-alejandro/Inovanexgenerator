@@ -38,12 +38,18 @@ routes.get('/radioget/:name', async (req, res) => {
         for (let index = 0; index < station.length; index++) {
           const element = station[index];
 
-          const programmingLinks = station[index].programming.split(',')
+          if(station[index].programming){
+            const programmingLinks = station[index].programming.split(',')
 
-          if(programmingLinks[0] !== ''){
-            const respuesta = await fetch(programmingLinks[0]);
-            const response = await respuesta.json()
-            station[index].programming = response.radio.programming
+            if(programmingLinks[0] !== ''){
+              try{
+                const respuesta = await fetch(programmingLinks[0]);
+                const response = await respuesta.json()
+                station[index].programming = response.radio.programming
+              }catch(response){
+                console.log(response)
+              }
+            }
           }
         }
 
@@ -134,17 +140,19 @@ routes.post("/create", (req, res) => {
     stationData.forEach(val => {
 
       let audioLinks = [];
-      let metadataLinks = []
+      let metadataLinks = [];
+      let programmingLinks = [];
 
       val.station_links.forEach(val => {
         audioLinks.push(val.link);
-        metadataLinks.push(val.metadata)
+        metadataLinks.push(val.metadata);
+        programmingLinks.push(val.programming)
       })
 
       console.log(audioLinks)
 
-      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata)
-      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataLinks}');`
+      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata, programming)
+      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataLinks}', '${programmingLinks}');`
 
       // Se insertan los datos en la tabla
       try {
@@ -163,8 +171,7 @@ routes.post("/create", (req, res) => {
 
   // Si existe la config insertarlo en la base de datos
   if(configData){
-    const sql = `INSERT INTO config (id_station, multiradio, metadata, default_name, default_slogan, logo_img, json_cover)
-      VALUES ('${singleId}' ,'${configData.multiradio}', '${configData.metadata}', '${configData.default_name}', '${configData.default_slogan}', '${configData.logo_img}', '${configData.json_cover}');`
+    const sql = `INSERT INTO config (id_station, multiradio, metadata, default_name, default_slogan, logo_img, json_cover, color) VALUES ('${singleId}' ,'${configData.multiradio}', '${configData.metadata}', '${configData.default_name}', '${configData.default_slogan}', '${configData.logo_img}', '${configData.json_cover}', '${configData.color}');`
 
     // Se insertan los datos en la tabla
   try{
