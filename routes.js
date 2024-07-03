@@ -148,11 +148,8 @@ routes.post("/create", (req, res) => {
         metadataLinks.push(val.metadata);
         programmingLinks.push(val.programming)
       })
-
-      console.log(audioLinks)
-
-      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata, programming)
-      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataLinks}', '${programmingLinks}');`
+      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata, programming, slogan)
+      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataLinks}', '${programmingLinks}', '${val.slogan}');`
 
       // Se insertan los datos en la tabla
       try {
@@ -171,7 +168,8 @@ routes.post("/create", (req, res) => {
 
   // Si existe la config insertarlo en la base de datos
   if(configData){
-    const sql = `INSERT INTO config (id_station, multiradio, metadata, default_name, default_slogan, logo_img, json_cover, color) VALUES ('${singleId}' ,'${configData.multiradio}', '${configData.metadata}', '${configData.default_name}', '${configData.default_slogan}', '${configData.logo_img}', '${configData.json_cover}', '${configData.color}');`
+    const sql = `INSERT INTO config (id_station, multiradio, metadata, default_name, default_slogan, logo_img, json_cover, color, color2, font) 
+    VALUES ('${singleId}' ,'${configData.multiradio}', '${configData.metadata}', '${configData.default_name}', '${configData.default_slogan}', '${configData.logo_img}', '${configData.json_cover}', '${configData.color}', '${configData.color2}', '${configData.font}');`
 
     // Se insertan los datos en la tabla
   try{
