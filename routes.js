@@ -140,16 +140,16 @@ routes.post("/create", (req, res) => {
     stationData.forEach(val => {
 
       let audioLinks = [];
-      let metadataLinks = [];
       let programmingLinks = [];
+
+      const metadataVal = [val.metadata]
 
       val.station_links.forEach(val => {
         audioLinks.push(val.link);
-        metadataLinks.push(val.metadata);
         programmingLinks.push(val.programming)
       })
       const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata, programming, slogan)
-      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataLinks}', '${programmingLinks}', '${val.slogan}');`
+      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataVal}', '${programmingLinks}', '${val.slogan}');`
 
       // Se insertan los datos en la tabla
       try {
