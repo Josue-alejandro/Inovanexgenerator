@@ -5,6 +5,7 @@ const routes = require("./routes.js"); // Archivo de las rutas
 // Configuración de middleware para aceptar datos JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'))
 
 // Configurar cabeceras y cors
 app.use((req, res, next) => {

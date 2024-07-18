@@ -2,6 +2,24 @@ const express = require('express');
 const routes = express.Router();
 const db = require('./db.js');
 const { generateString, currentDate, findAdmin } = require('./functions.ts')
+const multer  = require('multer')
+const SharpMulter  =  require("sharp-multer");
+
+const newFilenameFunction = (og_filename, options, req) => {
+  return `${og_filename.substring(0, 30)}_${Date.now()}.${options.fileFormat}`;
+};
+
+const storage = SharpMulter ({
+  destination:(req, file, callback) =>callback(null, "./public/images"),
+  imageOptions:{
+   fileFormat: "webp",
+   quality: 80,
+   resize: { width: 400, height: 400, resizeMode: 'fill' },
+  },
+  filename: newFilenameFunction
+});
+
+const upload = multer({ storage: storage })
 
 // Endpoint para obtener la data de los reproductores
 routes.get('/playerdata', (req, res) => {
@@ -104,12 +122,15 @@ routes.post("/login", (req, res) => {
   
 })
 
+
 // Endpoint para generar un reproductor mas usuario generico
-routes.post("/create", (req, res) => {
+routes.post("/create", upload.array('covers'), (req, res) => {
   // Se reune la data enviada por el generador
+  console.log('fotos', req.files)
+  console.log('info', req.body)
   const singleId = generateString(7);
-  const stationData = req.body.station;
-  const configData = req.body.config;
+  const stationData = JSON.parse(req.body.station);
+  const configData = JSON.parse(req.body.config);
   const userName = generateString(10);
   const password = generateString(25)
 
@@ -119,7 +140,6 @@ routes.post("/create", (req, res) => {
     console.log(date)
     const sql = `INSERT INTO users (name, password, creation_date, id_config, id_station)
       VALUES ('${userName}', '${password}', '${date}','${singleId}', '${singleId}');`
-    console.log(sql)
 
     try {
       db.query(sql, (err, data) => {
@@ -137,7 +157,7 @@ routes.post("/create", (req, res) => {
 
     console.log(stationData)
 
-    stationData.forEach(val => {
+    stationData.forEach((val, index) => {
 
       let audioLinks = [];
       let programmingLinks = [];
@@ -148,13 +168,14 @@ routes.post("/create", (req, res) => {
         audioLinks.push(val.link);
         programmingLinks.push(val.programming)
       })
-      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata, programming, slogan)
-      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataVal}', '${programmingLinks}', '${val.slogan}');`
+      const sql = `INSERT INTO stations (id_station, station_name, station_links, metadata, img, programming, slogan)
+      VALUES ('${singleId}', '${val.station_name}', '${audioLinks}', '${metadataVal}', '${req.files[index].filename}', '${programmingLinks}', '${val.slogan}');`
 
       // Se insertan los datos en la tabla
       try {
         db.query(sql, (err, data) => {
           console.log(err)
+          console.log(data)
           console.log("insertado correctamente")
         })
       } catch (error) {
